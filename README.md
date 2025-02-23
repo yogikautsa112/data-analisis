@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ## ▶️ Jalankan Aplikasi  
 
 ```sh
-streamlit run dashboard.py
+streamlit run dashboard/dashboard.py
 ```
 
 Aplikasi akan berjalan di **http://localhost:8501** (default Streamlit).  

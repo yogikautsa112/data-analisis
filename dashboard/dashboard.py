@@ -28,11 +28,16 @@ orders['season'] = orders['order_purchase_timestamp'].dt.month % 12 // 3 + 1
 season_labels = {1: "Musim Dingin", 2: "Musim Semi", 3: "Musim Panas", 4: "Musim Gugur"}
 orders['season'] = orders['season'].map(season_labels)
 
-customer_orders = orders.groupby("customer_id").size().reset_index(name="order_count")
+# Fitur interaktif: Filter berdasarkan musim
+selected_season = st.selectbox("Pilih Musim", options=list(season_labels.values()))
+
+filtered_orders = orders[orders['season'] == selected_season]
+
+customer_orders = filtered_orders.groupby("customer_id").size().reset_index(name="order_count")
 avg_order_per_customer = customer_orders["order_count"].mean()
 st.metric("Rata-rata pesanan per pelanggan", f"{avg_order_per_customer:.2f}")
 
-merged_data = order_items.merge(orders[['order_id', 'season']], on='order_id')
+merged_data = order_items.merge(filtered_orders[['order_id', 'season', 'order_purchase_timestamp']], on='order_id')
 merged_data = merged_data.merge(products[['product_id', 'product_category_name']], on='product_id')
 seasonal_top_products = merged_data.groupby(['season', 'product_category_name']).size().reset_index(name='count')
 top_products = seasonal_top_products.sort_values(['season', 'count'], ascending=[True, False]).groupby('season').head(5)
@@ -40,3 +45,9 @@ top_products = seasonal_top_products.sort_values(['season', 'count'], ascending=
 fig_seasonal = px.bar(top_products, x='product_category_name', y='count', color='season', barmode='group', 
                         title='Produk Terlaris di Setiap Musim')
 st.plotly_chart(fig_seasonal)
+
+# Visualisasi kedua: Tren penjualan berdasarkan kategori produk
+category_sales = merged_data.groupby(['product_category_name', 'order_purchase_timestamp']).size().reset_index(name='count')
+fig_category_sales = px.line(category_sales, x='order_purchase_timestamp', y='count', color='product_category_name', 
+                            title='Tren Penjualan Berdasarkan Kategori Produk')
+st.plotly_chart(fig_category_sales)
