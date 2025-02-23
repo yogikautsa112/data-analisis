@@ -46,7 +46,6 @@ fig_seasonal = px.bar(top_products, x='product_category_name', y='count', color=
                         title='Produk Terlaris di Setiap Musim')
 st.plotly_chart(fig_seasonal)
 
-# Visualisasi kedua: Tren penjualan berdasarkan kategori produk
 category_sales = merged_data.groupby(['product_category_name', 'order_purchase_timestamp']).size().reset_index(name='count')
 fig_category_sales = px.line(category_sales, x='order_purchase_timestamp', y='count', color='product_category_name', 
                             title='Tren Penjualan Berdasarkan Kategori Produk')
