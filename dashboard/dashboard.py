@@ -28,10 +28,13 @@ orders['season'] = orders['order_purchase_timestamp'].dt.month % 12 // 3 + 1
 season_labels = {1: "Musim Dingin", 2: "Musim Semi", 3: "Musim Panas", 4: "Musim Gugur"}
 orders['season'] = orders['season'].map(season_labels)
 
-# Fitur interaktif: Filter berdasarkan musim
-selected_season = st.selectbox("Pilih Musim", options=list(season_labels.values()))
+season_options = ["Semua Musim"] + list(season_labels.values())
+selected_season = st.selectbox("Pilih Musim", options=season_options)
 
-filtered_orders = orders[orders['season'] == selected_season]
+if selected_season != "Semua Musim":
+    filtered_orders = orders[orders['season'] == selected_season]
+else:
+    filtered_orders = orders
 
 customer_orders = filtered_orders.groupby("customer_id").size().reset_index(name="order_count")
 avg_order_per_customer = customer_orders["order_count"].mean()
